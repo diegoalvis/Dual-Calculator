@@ -1,4 +1,4 @@
-package com.diegoalvis.dualcaculator
+package com.diegoalvis.dualcalculator
 
 import org.junit.Test
 
