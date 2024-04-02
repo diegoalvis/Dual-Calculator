@@ -14,7 +14,7 @@
         android:background="@color/io_background"
         android:gravity="bottom"
         android:orientation="vertical"
-        android:padding="30dp">
+        android:padding="8dp">
 
         <TextView
             android:id="@+id/input"
@@ -42,7 +42,8 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="3"
         android:stretchColumns="*">
 
         <TableRow>
@@ -51,7 +52,7 @@
                 android:id="@+id/button_clear"
                 style="@style/Button_Style"
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/button_height"
+                android:layout_height="wrap_content"
                 android:text="C"
                 android:textColor="@color/red" />
 
@@ -207,7 +208,7 @@
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/button_equals"
                 style="@style/Button_Style"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="@dimen/button_height"
                 android:layout_weight="1"
                 android:text="="

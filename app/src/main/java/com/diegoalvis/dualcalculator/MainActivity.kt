@@ -21,5 +21,10 @@ class MainActivity : AppCompatActivity() {
 
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(_binding.root)
+
+        
+        if(_binding.fragmentContainerB != null) {
+            println("Landscape")
+        }
     }
 }
