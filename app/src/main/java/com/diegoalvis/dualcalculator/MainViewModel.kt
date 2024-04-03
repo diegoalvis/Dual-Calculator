@@ -7,23 +7,22 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.mariuszgromada.math.mxparser.Expression
 import java.text.DecimalFormat
 
 internal class MainViewModel(private val cache: Cache) : ViewModel() {
 
     // Pos 0 -> screen 0 , Pos 1 -> screen 1, ...
-    private val _uiState = MutableStateFlow(listOf(UiState()))
+    private val _uiState = MutableStateFlow<List<UiState>>(emptyList())
     val uiState: StateFlow<List<UiState>> = _uiState.asStateFlow()
 
     companion object {
+        const val BAD_EXPRESSION_MSG: String = "Bad exp"
+        const val ERROR_MSG: String = "Error"
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val context = (this[APPLICATION_KEY] as Application).applicationContext
@@ -33,19 +32,16 @@ internal class MainViewModel(private val cache: Cache) : ViewModel() {
         }
     }
 
-    init {
-        viewModelScope.launch {
-            val storedInfo = cache.readExpressions()
-                ?.map { computeOperation(it) }
-                ?.takeUnless { it.isEmpty() }
-                ?: listOf(UiState())
-
-            _uiState.emit(storedInfo)
-        }
-    }
-
     fun updateConfig(isLandscape: Boolean) {
         viewModelScope.launch {
+            if (_uiState.value.isEmpty()) {
+                val storedInfo = cache.readExpressions()
+                    ?.map { computeOperation(it) }
+                    ?.takeUnless { it.isEmpty() }
+                    ?: listOf(UiState())
+                _uiState.emit(storedInfo)
+            }
+
             if (isLandscape && _uiState.value.size == 1) {
                 _uiState.emit(_uiState.value.toMutableList().plus(UiState()))
             }
@@ -108,7 +104,7 @@ internal class MainViewModel(private val cache: Cache) : ViewModel() {
 
                 numericResult.isNaN() -> {
                     outputTextColor = R.color.red
-                    result = "Bad exp"
+                    result = BAD_EXPRESSION_MSG
                 }
 
                 else -> {
@@ -118,7 +114,7 @@ internal class MainViewModel(private val cache: Cache) : ViewModel() {
             }
         } catch (e: Exception) {
             outputTextColor = R.color.red
-            result = "Error"
+            result = ERROR_MSG
         }
 
         return UiState(
