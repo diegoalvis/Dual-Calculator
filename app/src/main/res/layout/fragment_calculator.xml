@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,13 +9,16 @@
     tools:ignore="HardcodedText">
 
     <LinearLayout
+        android:id="@+id/result_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
         android:background="@color/io_background"
         android:gravity="bottom"
         android:orientation="vertical"
-        android:padding="@dimen/result_container_padding">
+        android:padding="@dimen/result_container_padding"
+        app:layout_constraintBottom_toTopOf="@+id/pad_container"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_weight="2">
 
         <TextView
             android:id="@+id/output"
@@ -37,15 +41,16 @@
             android:textColor="@color/text_main"
             android:textSize="@dimen/input_text_size"
             tools:text="5+10-3" />
-
-
     </LinearLayout>
 
     <TableLayout
+        android:id="@+id/pad_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
-        android:stretchColumns="*">
+        android:stretchColumns="*"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/result_container"
+        app:layout_constraintVertical_weight="3">
 
         <TableRow
             android:layout_height="0dp"
@@ -247,4 +252,4 @@
         </TableRow>
     </TableLayout>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

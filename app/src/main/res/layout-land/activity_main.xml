@@ -5,22 +5,56 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    tools:ignore="RtlSymmetry">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
         android:name="com.diegoalvis.dualcalculator.CalculatorFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:paddingEnd="4dp"
         app:layout_constraintEnd_toStartOf="@id/fragment_container_b"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout="@layout/fragment_calculator" />
+
+    <ImageView
+        android:id="@+id/switchRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:background="@color/window_background"
+        android:elevation="2dp"
+        android:padding="2dp"
+        android:src="@drawable/baseline_arrow_circle_right_24"
+        app:layout_constraintBottom_toTopOf="@id/switchLeft"
+        app:layout_constraintEnd_toStartOf="@id/fragment_container"
+        app:layout_constraintStart_toEndOf="@id/fragment_container_b"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:tint="@color/green" />
+
+    <ImageView
+        android:id="@+id/switchLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/window_background"
+        android:elevation="2dp"
+        android:padding="2dp"
+        android:rotation="180"
+        android:src="@drawable/baseline_arrow_circle_right_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/switchRight"
+        app:layout_constraintStart_toStartOf="@+id/switchRight"
+        app:layout_constraintTop_toBottomOf="@id/switchRight"
+        app:tint="@color/green" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container_b"
         android:name="com.diegoalvis.dualcalculator.CalculatorFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:paddingStart="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/fragment_container"
         tools:layout="@layout/fragment_calculator" />
