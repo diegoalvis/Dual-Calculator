@@ -2,15 +2,13 @@ package com.diegoalvis.dualcalculator
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -20,7 +18,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("SetTextI18n")
 class CalculatorFragment : Fragment(R.layout.fragment_calculator) {
 
-    private val viewModel: MainViewModel by viewModels { MainViewModel.Factory }
+    private val viewModel: MainViewModel by activityViewModels()
     private lateinit var _binding: FragmentCalculatorBinding
     private val screenPosition: Int by lazy { requireNotNull(arguments?.getInt(SCREEN_POS)) }
 
@@ -112,8 +110,8 @@ class CalculatorFragment : Fragment(R.layout.fragment_calculator) {
             lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModel.uiState.collect { list ->
-                        val uiState = list[screenPosition]
-                        showResult(uiState = uiState)
+                        val uiState = list.getOrNull(screenPosition)
+                        uiState?.let { showResult(uiState = it) }
                     }
                 }
             }

@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.commit
 import com.diegoalvis.dualcalculator.databinding.ActivityMainBinding
-import org.mariuszgromada.math.mxparser.License
 
 
 class MainActivity : AppCompatActivity() {
@@ -33,7 +32,6 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.commit {
             replace(R.id.fragment_container, CalculatorFragment.newInstance(FIRST_FRAGMENT_POS), "$FIRST_FRAGMENT_POS")
             if (isLandscape) {
-                println("Landscape")
                 replace(R.id.fragment_container_b, CalculatorFragment.newInstance(SECOND_FRAGMENT_POS), "$SECOND_FRAGMENT_POS")
             }
             setReorderingAllowed(true)
