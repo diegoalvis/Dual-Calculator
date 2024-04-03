@@ -7,14 +7,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.diegoalvis.dualcalculator.databinding.FragmentCalculatorBinding
+import kotlinx.coroutines.launch
 
 @SuppressLint("SetTextI18n")
 class CalculatorFragment : Fragment(R.layout.fragment_calculator) {
 
-    private val viewModel: MainViewModel by activityViewModels()
+    private val viewModel: MainViewModel by viewModels { MainViewModel.Factory }
     private lateinit var _binding: FragmentCalculatorBinding
     private val screenPosition: Int by lazy { requireNotNull(arguments?.getInt(SCREEN_POS)) }
 
@@ -102,14 +108,20 @@ class CalculatorFragment : Fragment(R.layout.fragment_calculator) {
             }
         }
 
-        viewModel.uiState.observe(viewLifecycleOwner) { list ->
-            val uiState = list[screenPosition]
-            showResult(uiState = uiState)
+        with(viewLifecycleOwner) {
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModel.uiState.collect { list ->
+                        val uiState = list[screenPosition]
+                        showResult(uiState = uiState)
+                    }
+                }
+            }
         }
     }
 
     private fun onCalculate() {
-        viewModel.reduce(
+        viewModel.onEvent(
             UiEvents.Calculate(
                 screenPosition = screenPosition,
                 input = _binding.input.text.toString()

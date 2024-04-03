@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.commit
 import com.diegoalvis.dualcalculator.databinding.ActivityMainBinding
+import org.mariuszgromada.math.mxparser.License
 
 
 class MainActivity : AppCompatActivity() {
@@ -40,10 +41,10 @@ class MainActivity : AppCompatActivity() {
 
 
         _binding.switchLeft?.setOnClickListener {
-            viewModel.reduce(UiEvents.SendToNextScreen(direction = CommandDirection.LEFT))
+            viewModel.onEvent(UiEvents.SendToNextScreen(direction = CommandDirection.LEFT))
         }
         _binding.switchRight?.setOnClickListener {
-            viewModel.reduce(UiEvents.SendToNextScreen(direction = CommandDirection.RIGHT))
+            viewModel.onEvent(UiEvents.SendToNextScreen(direction = CommandDirection.RIGHT))
         }
 
     }

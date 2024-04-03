@@ -51,6 +51,14 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
 
     testImplementation(libs.junit)
+    testImplementation("io.mockk:mockk:1.13.10")
+    testImplementation("androidx.test.ext:junit-ktx:1.1.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+
+
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("org.mockito:mockito-core:5.1.1")
+
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
