@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="button_height">90dp</dimen>
+    <dimen name="result_container_padding">20dp</dimen>
+    <dimen name="input_text_size">24sp</dimen>
+    <dimen name="output_text_size">50sp</dimen>
 </resources>
