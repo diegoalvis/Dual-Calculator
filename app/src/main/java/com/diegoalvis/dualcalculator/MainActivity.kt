@@ -1,6 +1,5 @@
 package com.diegoalvis.dualcalculator
 
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -13,7 +12,7 @@ import com.diegoalvis.dualcalculator.databinding.ActivityMainBinding
 class MainActivity : AppCompatActivity() {
 
     private lateinit var _binding: ActivityMainBinding
-    private val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels { MainViewModel.Factory }
 
     companion object {
         const val FIRST_FRAGMENT_POS = 0
@@ -28,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(_binding.root)
 
         val isLandscape = _binding.fragmentContainerB != null // other way: use Configuration.ORIENTATION_LANDSCAPE
-        viewModel.initialSetup(isLandscape)
+        viewModel.updateConfig(isLandscape)
 
         supportFragmentManager.commit {
             replace(R.id.fragment_container, CalculatorFragment.newInstance(FIRST_FRAGMENT_POS), "$FIRST_FRAGMENT_POS")

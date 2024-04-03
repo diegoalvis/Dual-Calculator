@@ -1,43 +1,46 @@
 package com.diegoalvis.dualcalculator
 
-import androidx.annotation.ColorRes
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.mariuszgromada.math.mxparser.Expression
 import java.text.DecimalFormat
 
-enum class CommandDirection { LEFT, RIGHT }
-internal data class UiState(
-    val input: String = "",
-    val result: String = "",
-    @ColorRes val outputTextColor: Int = R.color.green,
-)
-
-internal sealed class UiEvents {
-    data class Calculate(
-        val screenPosition: Int,
-        val input: String,
-    ) : UiEvents()
-
-    data class SendToNextScreen(
-        val direction: CommandDirection,
-    ) : UiEvents()
-}
-
-internal class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
+internal class MainViewModel(private val cache: Cache) : ViewModel() {
 
     // Pos 0 -> screen 0 , Pos 1 -> screen 1, ...
-    private val _uiState: MutableLiveData<List<UiState>> = savedStateHandle.getLiveData("expression", listOf(UiState()))
+    private val _uiState = MutableLiveData<List<UiState>>()
     val uiState: LiveData<List<UiState>> = _uiState
 
-    // TODO implement dynamically way to load initial values
-    fun initialSetup(isLandscape: Boolean) {
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val context = (this[APPLICATION_KEY] as Application).applicationContext
+                val cache: Cache = CacheImpl(context = context, preferencesName = "session_pref")
+                MainViewModel(cache = cache)
+            }
+        }
+    }
+
+    init {
+        viewModelScope.launch {
+            val storedInfo = cache.readExpressions()?.map {
+                computeOperation(it)
+            } ?: listOf(UiState())
+            _uiState.value = storedInfo
+        }
+    }
+
+    fun updateConfig(isLandscape: Boolean) {
         if (isLandscape && _uiState.value?.size == 1) {
             _uiState.value = _uiState.value?.toMutableList()?.plus(UiState())
         }
@@ -47,8 +50,17 @@ internal class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         viewModelScope.launch {
             when (event) {
                 is UiEvents.Calculate -> {
-                    computeOperation(event)
+                    val uiState = computeOperation(event.input)
+                    _uiState.value?.toMutableList()?.apply {
+                        set(event.screenPosition, uiState)
+                    }?.let { newValue ->
+                        _uiState.value = newValue
+                        // Save result
+                        val expressions = newValue.map { it.input }
+                        cache.writeExpressions(expressions)
+                    }
                 }
+
                 is UiEvents.SendToNextScreen -> {
                     transferInfoBetweenCalculators(event)
                 }
@@ -64,6 +76,7 @@ internal class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
                 sourceIndex = 1
                 targetIndex = 0
             }
+
             CommandDirection.RIGHT -> {
                 sourceIndex = 0
                 targetIndex = 1
@@ -76,14 +89,14 @@ internal class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         _uiState.value = newValue?.toList()
     }
 
-    private suspend fun computeOperation(event: UiEvents.Calculate) {
-        withContext(Dispatchers.Default) { // Could use IO as the calculator only has basic operations
+    private suspend fun computeOperation(input: String): UiState {
+        return withContext(Dispatchers.Default) { // Could use IO as the calculator only has basic operations
             var result: String
             var outputTextColor: Int
             try {
-                val numericResult = Expression(event.input).calculate()
+                val numericResult = Expression(input).calculate()
                 when {
-                    event.input.isEmpty() -> {
+                    input.isEmpty() -> {
                         result = ""
                         outputTextColor = R.color.green
                     }
@@ -102,24 +115,16 @@ internal class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
                 outputTextColor = R.color.red
                 result = "Error"
             }
-            val uiState = UiState(
-                input = event.input,
+
+            return@withContext UiState(
+                input = input,
                 result = result,
                 outputTextColor = outputTextColor,
             )
-            withContext(Dispatchers.Main) {
-                val newValue = _uiState.value?.toMutableList()?.apply {
-                    set(event.screenPosition, uiState)
-                }
-                _uiState.value = newValue?.toList()
-            }
         }
     }
 }
 
-
 private fun Double.getFormattedOutput(): String {
     return DecimalFormat("0.######").format(this).toString()
 }
-
-
