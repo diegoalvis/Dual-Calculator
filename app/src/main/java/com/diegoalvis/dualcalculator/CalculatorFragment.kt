@@ -8,17 +8,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import com.diegoalvis.dualcalculator.databinding.FragmentCalculatorBinding
-import org.mariuszgromada.math.mxparser.Expression
-import java.text.DecimalFormat
 
 @SuppressLint("SetTextI18n")
 class CalculatorFragment : Fragment(R.layout.fragment_calculator) {
 
+    private val viewModel: MainViewModel by activityViewModels()
     private lateinit var _binding: FragmentCalculatorBinding
+    private val screenPosition: Int by lazy { requireNotNull(arguments?.getInt(SCREEN_POS)) }
 
     companion object {
-        fun newInstance() = CalculatorFragment()
+        private const val SCREEN_POS = "screenPos"
+        fun newInstance(screenPos: Int): CalculatorFragment {
+            return CalculatorFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(SCREEN_POS, screenPos)
+                }
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -32,8 +40,8 @@ class CalculatorFragment : Fragment(R.layout.fragment_calculator) {
             buttonClear.setOnClickListener {
                 input.text = ""
                 output.text = ""
+                onCalculate()
             }
-
             buttonBracketStart.setOnClickListener {
                 input.addToInputText("(")
             }
@@ -90,40 +98,34 @@ class CalculatorFragment : Fragment(R.layout.fragment_calculator) {
                 input.addToInputText("+")
             }
             buttonEquals.setOnClickListener {
-                showResult()
+                onCalculate()
             }
         }
+
+        viewModel.uiState.observe(viewLifecycleOwner) { list ->
+            val uiState = list[screenPosition]
+            showResult(uiState = uiState)
+        }
+    }
+
+    private fun onCalculate() {
+        viewModel.reduce(
+            UiEvents.Calculate(
+                screenPosition = screenPosition,
+                input = _binding.input.text.toString()
+            )
+        )
     }
 
     private fun TextView.addToInputText(buttonValue: String) {
         text = text.toString() + "" + buttonValue
     }
 
-    private fun getInputExpression(): String {
-        var expression = _binding.input.text.replace(Regex("÷"), "/")
-        expression = expression.replace(Regex("×"), "*")
-        return expression
-    }
-
-    private fun showResult() {
+    private fun showResult(uiState: UiState) {
         with(_binding) {
-            try {
-                val expression = getInputExpression()
-                val result = Expression(expression).calculate()
-                if (result.isNaN()) {
-                    // Show Error Message
-                    output.text = ""
-                    output.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
-                } else {
-                    // Show Result
-                    output.text = DecimalFormat("0.######").format(result).toString()
-                    output.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
-                }
-            } catch (e: Exception) {
-                // Show Error Message
-                output.text = ""
-                output.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
-            }
+            output.setTextColor(ContextCompat.getColor(requireContext(), uiState.outputTextColor))
+            input.text = uiState.input
+            output.text = uiState.result
         }
     }
 }

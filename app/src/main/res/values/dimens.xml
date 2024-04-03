@@ -3,4 +3,6 @@
     <dimen name="result_container_padding">20dp</dimen>
     <dimen name="input_text_size">24sp</dimen>
     <dimen name="output_text_size">50sp</dimen>
+    <dimen name="pad_button_text_size">22sp</dimen>
+    <dimen name="arrow_button_dimen">30dp</dimen>
 </resources>
