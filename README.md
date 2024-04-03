@@ -1,4 +1,8 @@
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/diegoalvispal/)
+
 # 🤖 Dual Calculator  ➕➖ ✖️➗
+
+[![Unit Test](https://github.com/diegoalvis/Dual-Calculator/actions/workflows/UnitTest.yml/badge.svg)](https://github.com/diegoalvis/Dual-Calculator/actions/workflows/UnitTest.yml)
 
 Dual Calculator is a versatile Android calculator app designed to cater to a wide range of users. From quick calculations to more complex mathematical problems, Dual Calculator provides an intuitive and efficient experience.
 Inspired by [Calculator-App](https://github.com/JahidHasanCO/Calculator-App)
